@@ -26,6 +26,8 @@ function App() {
     [red,'',red,'',red,'',red,''],
   ])
 
+  const [moves, setMoves] = useState<number[][]>([])
+
   /**
    * this is a helper function which gives the cells of the board their correct color.
    * @param i row number
@@ -33,15 +35,42 @@ function App() {
    * @returns string with correct class name to color board
    */
   const colorBoard = (i : number, j: number) =>{
-    let clasName = "cell"
+    let className = "cell"
     if(i % 2 == 0){
-      if(j % 2 == 0) clasName += " brown"
-      else clasName += " white"
+      if(j % 2 == 0) className += " brown"
+      else className += " white"
     }else{
-      if(j % 2 == 0) clasName += " white"
-      else clasName += " brown"
+      if(j % 2 == 0) className += " white"
+      else className += " brown"
     }
-    return clasName
+
+    if (moves.some(([x, y]) => x === i && y === j)) {
+      className = "cell green"
+    }
+
+    return className
+  }
+
+  const showRedMove = (i : number, j: number, cell : (string | JSX.Element)) =>{
+    const movesArr = []
+    if (i === 0) return;
+    if(cell === red){
+      let up = i - 1;
+      let left = j - 1;
+      let right = j + 1; 
+      if(left >= 0 && board[up][left] !== red) movesArr.push([up,left])
+      if(right <= 7 && board[up][right] !== red) movesArr.push([up,right])
+      console.log(...movesArr);
+    }
+    if(cell === black){
+      let down = i + 1;
+      let left = j - 1;
+      let right = j + 1; 
+      if(left >= 0 && board[down][left] !== black) movesArr.push([down,left])
+      if(right <= 7 && board[down][right] !== black) movesArr.push([down,right])
+      console.log(...movesArr);
+    }
+    setMoves(movesArr);
   }
 
   return (
@@ -50,7 +79,7 @@ function App() {
         <div className='game-board'> 
           {board.map((row, i) => 
             row.map((cell, j) =>{
-              return <div className={`${colorBoard(i,j)}`}>{cell}</div>;
+              return <div onClick={() => showRedMove(i,j, cell)} className={`${colorBoard(i,j)}`}>{cell}{`r : ${i}, c : ${j}`}</div>;
             })
           )}
         </div>

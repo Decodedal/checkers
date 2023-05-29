@@ -18,6 +18,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  color:black;
 }
 
 .white{  
@@ -26,4 +27,8 @@
 
 .brown{
   background-color: #7f6152;
+}
+
+.green{
+  background-color: greenyellow;
 }
