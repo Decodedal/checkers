@@ -1,1 +1,1 @@
-"# checkers" 
+Creating a game of checkers to practice logic and efficient coding principals!
