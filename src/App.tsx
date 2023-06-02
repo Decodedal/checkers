@@ -58,11 +58,14 @@ function App() {
     return className
   }
 
+  console.log(piceToTake)
+
   const showRedMove = (i : number, j: number, cell : (string | JSX.Element)) =>{
     if(possibleMoves.some(([x, y]) => x === i && y === j)){
       //checking to see if a pice is going to be taken 
       //if so move player checker and delete oponent checker 
-      if(i - 1 > checkerToMove!.position[0]){
+      console.log(checkerToMove!.position[0], i )
+      if((checkerToMove!.type === red && checkerToMove!.position[0] - i > 1) || (checkerToMove!.type === black && i - checkerToMove!.position[0] > 1)){
       let updatedGame = [...board]
       updatedGame[checkerToMove!.position[0]][checkerToMove!.position[1]] = "";
       updatedGame[i][j] = checkerToMove!.type
@@ -80,35 +83,48 @@ function App() {
       return;
     }
 
+    //this arr will store our possible moves 
     const movesArr = []
+    //pice at the top of board cancle 
     if (i === 0) return;
     if(cell === red){
       let up = i - 1;
       let left = j - 1;
-      let right = j + 1; 
+      let right = j + 1;
+      //if move does not go off screen and is not occupied by other red checker  
       if(left >= 0 && board[up][left] !== red){
+        //if the space is occupide by a black checker 
         if(board[up][left] === black){
+          
+          
+          //store the pice to take cordinates
           setPiceToTake([up,left])
-          up--;
-          left--;
-          if(left >= 0 && board[up][left] === ""){
-            movesArr.push([up,left])
+          let moreUp = up - 1;
+          let moreLeft = left -1;
+          console.log(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === "")
+          //change the target to the diagonal beyond that pice and see if it is empty 
+          if(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === ""){
+            //if it is add that to the possible moves
+            movesArr.push([moreUp , moreLeft])
           }
         }else{
+          //nevermind forget the stored pice we could have taken 
           setPiceToTake([])
           movesArr.push([up,left])
         }
       }
       if(right <= 7 && board[up][right] !== red){
-        if(board[up][right] === red){
+        if(board[up][right] === black){
           setPiceToTake([up,right])
-          up--;
-          right++;
-          if(right <= 7 && board[up][right] === ""){
-            movesArr.push([up,right])
+          let moreUp = up - 1;
+          let moreRight = right + 1;
+          if(moreRight <= 7 && moreUp <= 7 && board[moreUp][moreRight] === ""){
+            movesArr.push([moreUp , moreRight])
           }
+        }else{
+          setPiceToTake([])
+          movesArr.push([up,right])
         }
-        movesArr.push([up,right])
       }
     }
     if(cell === black){
@@ -120,10 +136,10 @@ function App() {
         //if a red pice is their check to see if it can be jumped else ignore 
         if(board[down][left] === red){
           setPiceToTake([down, left])
-          down++;
-          left--;
-          if(left >= 0 && board[down][left] === ""){
-            movesArr.push([down,left])
+          let moreDown = down + 1
+          let moreLeft = left - 1
+          if(moreLeft >= 0 && moreDown >= 0 && board[moreDown][moreLeft] === ""){
+            movesArr.push([moreDown, moreLeft])
           }
         }else{
           setPiceToTake([])
@@ -133,10 +149,10 @@ function App() {
       if(right <= 7 && board[down][right] !== black){
         if(board[down][right] === red){   
           setPiceToTake([down, right])
-          down++;
-          right++;
-          if(right <= 7 && board[down][right] === ""){
-            movesArr.push([down,right])
+          let moreDown = down + 1
+          let moreRight = right + 1
+          if(moreRight <= 7 && moreDown <= 7 && board[moreDown][moreRight] === ""){
+            movesArr.push([moreDown,moreRight])
           }
         }else{
           setPiceToTake([])
