@@ -35,6 +35,10 @@ function App() {
   const [checkerToMove, setCheckerToMove] = useState<checkerToMove>()
   const [piceToTake, setPiceToTake] = useState<number[]>([])
 
+  //if(possibleMoves)console.log("possible Moves", possibleMoves)
+  //if(checkerToMove)console.log("checker to Move", checkerToMove)
+  //if(piceToTake)console.log("pice To Take", piceToTake)
+
   /**
    * this is a helper function which gives the cells of the board their correct color.
    * @param i row number
@@ -58,10 +62,10 @@ function App() {
     return className
   }
 
-  console.log(piceToTake)
 
   const showRedMove = (i : number, j: number, cell : (string | JSX.Element)) =>{
     if(possibleMoves.some(([x, y]) => x === i && y === j)){
+      console.log("Takeing stage")
       //checking to see if a pice is going to be taken 
       //if so move player checker and delete oponent checker 
       console.log(checkerToMove!.position[0], i )
@@ -70,8 +74,61 @@ function App() {
       updatedGame[checkerToMove!.position[0]][checkerToMove!.position[1]] = "";
       updatedGame[i][j] = checkerToMove!.type
       updatedGame[piceToTake[0]][piceToTake[1]] = ""
+      setPossibleMoves([])
       setBoard(updatedGame)
-        return;
+
+      //checking for double jump 
+      let doublejumpArr = []
+      if(checkerToMove?.type === red){
+        let up = i - 1;
+        let left = j - 1;
+        let right = j + 1;
+        if(left >= 0 &&  up <= 7 && board[up][left] === black){
+          let moreUp = up - 1;
+          let moreLeft = left -1;
+          if(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === ""){
+            //if it is add that to the possible moves
+            //store the pice to take cordinates
+            console.log("here")
+            setPiceToTake([up,left])
+            doublejumpArr.push([moreUp , moreLeft])
+          }
+        }
+          if(right >= 7 &&  up <= 7 && board[up][right] === black){
+            let moreUp = up - 1;
+            let moreRight = right -1;
+            if(moreRight >= 0 && moreUp <= 7 && board[moreUp][moreRight] === ""){
+              //if it is add that to the possible moves
+              //store the pice to take cordinates
+              console.log("here")
+              setPiceToTake([up,left])
+              doublejumpArr.push([moreUp , moreRight])
+            }
+          }
+        } else if(checkerToMove?.type === black){
+            let down = i - 1;
+            let left = j - 1;
+            let right = j + 1;
+            if(left >= 0 &&  down > 0 && board[down][left] === red){
+              let moreDown = down + 1;
+              let moreLeft = left - 1;
+              if(moreLeft >= 0 && moreDown <= 7 && board[moreDown][moreLeft] === ""){
+                setPiceToTake([down,left])
+                doublejumpArr.push([moreDown , moreLeft])
+              }
+            }
+              if(right >= 7 &&  down <= 7 && board[down][right] === black){
+                let moreDown = down + 1;
+                let moreRight = right -1;
+                if(moreRight >= 0 && moreDown <= 7 && board[moreDown][moreRight] === ""){
+                  setPiceToTake([down,left])
+                  doublejumpArr.push([moreDown , moreRight])
+                }
+              }
+            }
+          
+    
+      return;
       }
       console.log("cool")
       let updatedGame = [...board]
@@ -95,21 +152,20 @@ function App() {
       if(left >= 0 && board[up][left] !== red){
         //if the space is occupide by a black checker 
         if(board[up][left] === black){
-          
-          
-          //store the pice to take cordinates
-          setPiceToTake([up,left])
           let moreUp = up - 1;
           let moreLeft = left -1;
-          console.log(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === "")
+          //console.log(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === "")
           //change the target to the diagonal beyond that pice and see if it is empty 
           if(moreLeft >= 0 && moreUp <= 7 && board[moreUp][moreLeft] === ""){
             //if it is add that to the possible moves
+            //store the pice to take cordinates
+            console.log("here")
+            setPiceToTake([up,left])
             movesArr.push([moreUp , moreLeft])
           }
         }else{
           //nevermind forget the stored pice we could have taken 
-          setPiceToTake([])
+          
           movesArr.push([up,left])
         }
       }
@@ -122,12 +178,11 @@ function App() {
             movesArr.push([moreUp , moreRight])
           }
         }else{
-          setPiceToTake([])
           movesArr.push([up,right])
         }
       }
     }
-    if(cell === black){
+    else if(cell === black){
       let down = i + 1;
       let left = j - 1;
       let right = j + 1; 
@@ -142,7 +197,6 @@ function App() {
             movesArr.push([moreDown, moreLeft])
           }
         }else{
-          setPiceToTake([])
           movesArr.push([down,left])
         }
       }
@@ -155,7 +209,6 @@ function App() {
             movesArr.push([moreDown,moreRight])
           }
         }else{
-          setPiceToTake([])
           movesArr.push([down,right]);
         }
       }
